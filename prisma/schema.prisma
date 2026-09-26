@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Circuit {
+  id String @id @default(cuid())
+  jolpicaCircuitId String @unique
+  name String
+  location String
+  races Race[]
+}
+
+model Team {
+  id String @id @default(cuid())
+  jolpicaConstructorId String @unique
+  name String
+  raceResults RaceResult[]
+  favoriteTeams FavoriteTeam[]
+}
+
+model Driver {
+  id String @id @default(cuid())
+  jolpicaDriverId String @unique
+  name String
+  nationality String
+  raceResults RaceResult[]
+  favoriteDrivers FavoriteDriver[]
+}
+
+model Race {
+  id String @id @default(cuid())
+  circuitId String
+  circuit Circuit @relation(fields: [circuitId],references: [id])
+  season Int
+  round Int
+  date DateTime
+  sessionType String
+  raceResults RaceResult[]
+  @@unique([season, round, sessionType])
+}
+
+model RaceResult {
+  id        String @id @default(cuid())
+  driverId  String
+  driver    Driver @relation(fields: [driverId], references: [id])
+  raceId    String
+  race      Race @relation(fields: [raceId], references: [id])
+  teamId    String
+  team      Team @relation(fields: [teamId], references: [id])
+  placement Int
+  points    Float
+  @@unique([driverId, raceId])
+}
+
+model User {
+  id String @id @default(cuid())
+  name String
+  email String @unique
+  password String
+  favoriteTeams FavoriteTeam[]
+  favoriteDrivers FavoriteDriver[]
+}
+
+model FavoriteTeam {
+  userId String
+  teamId String
+  user User @relation(fields: [userId], references: [id])
+  team Team @relation(fields: [teamId], references: [id])
+  @@id([userId, teamId])
+}
+
+model FavoriteDriver {
+  userId String
+  driverId String
+  user User @relation(fields: [userId], references: [id])
+  driver Driver @relation(fields: [driverId], references: [id])
+  @@id([userId, driverId])
+}
