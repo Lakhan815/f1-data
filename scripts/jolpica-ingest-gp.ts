@@ -1,8 +1,10 @@
 import "dotenv/config";
 import prisma from "../app/lib/prisma";
+import type { ScheduledEvent, Context } from "aws-lambda";
 
 async function main() {
-  for (let season = 2000; season <= 2026; season++) {
+  const currentYear = new Date().getFullYear();
+  for (let season = currentYear; season <= currentYear; season++) {
     let offset = 0;
     let total = Infinity;
 
@@ -76,7 +78,11 @@ async function main() {
             where: {
               driverId_raceId: { driverId: driver.id, raceId: race.id },
             },
-            update: {},
+            update: {
+              teamId: team.id,
+              placement: parseInt(result.position),
+              points: parseFloat(result.points),
+            },
             create: {
               driverId: driver.id,
               raceId: race.id,
@@ -95,6 +101,7 @@ async function main() {
   }
 }
 
-main()
-  .catch(console.error)
-  .finally(() => prisma.$disconnect());
+export const handler = async (event: ScheduledEvent, context: Context) => {
+  await main().catch(console.error);
+  return { statusCode: 200, body: "done" };
+};
