@@ -30,12 +30,12 @@ Some older seasons have no qualifying data in the source API. The schema allows 
 
 ## Schema
 
-| Table | Purpose |
-|---|---|
-| `Circuit`, `Team`, `Driver` | Core entities, each with a unique Jolpica ID stored for safe upserts |
-| `Race` | One row per season, round, and session type (Grand Prix, Sprint, Qualifying) |
-| `RaceResult` | A driver's finishing position and points for one race, with the team they drove for at that time |
-| `User`, `FavoriteTeam`, `FavoriteDriver` | Planned favorites feature, using composite primary keys on the junction tables |
+| Table                                    | Purpose                                                                                          |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `Circuit`, `Team`, `Driver`              | Core entities, each with a unique Jolpica ID stored for safe upserts                             |
+| `Race`                                   | One row per season, round, and session type (Grand Prix, Sprint, Qualifying)                     |
+| `RaceResult`                             | A driver's finishing position and points for one race, with the team they drove for at that time |
+| `User`, `FavoriteTeam`, `FavoriteDriver` | Planned favorites feature, using composite primary keys on the junction tables                   |
 
 Design choices worth noting:
 
@@ -92,7 +92,6 @@ Then deploy the new image on the Lambda function and set `DATABASE_URL` (and `DB
 ## Known limitations
 
 - The ingestion handler currently logs errors without failing the invocation, so a broken run can look like a success. A fix is planned.
-- Certificate verification against the RDS CA bundle works locally; deploying it to the Lambda function is in progress.
 - The database is reachable from the public internet and relies on a strong role password. This should be revisited before user accounts ship.
 - The sprint and qualifying ingestion functions exist as scripts but are not yet deployed as scheduled Lambdas.
 
